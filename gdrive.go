@@ -45,6 +45,12 @@ func main() {
 			Patterns:    []string{"--service-account"},
 			Description: "Oauth service account filename, used for server to server communication without user interaction (filename path is relative to config dir)",
 		},
+		cli.StringFlag{
+			Name:        "advanced",
+			Patterns:    []string{"-a", "--advanced"},
+			Description: "Advanced Mode -- lets you specify your own oauth client id and secret on setup",
+
+		},
 	}
 
 	handlers := []*cli.Handler{

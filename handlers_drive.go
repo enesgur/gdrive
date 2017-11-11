@@ -355,6 +355,15 @@ func getOauthClient(args cli.Arguments) (*http.Client, error) {
 
 	configDir := getConfigDir(args)
 
+	if args.String("advanced") != ""  {
+		tokenPath := ConfigFilePath(configDir, TokenFilename)
+		clientId, clientSecret, err := authAdvancedPrompt()
+		if err != nil {
+			return nil, err
+		}
+		return auth.NewFileSourceClient(clientId, clientSecret, tokenPath, authCodePrompt)
+	}
+
 	if args.String("serviceAccount") != "" {
 		serviceAccountPath := ConfigFilePath(configDir, args.String("serviceAccount"))
 		serviceAccountClient, err := auth.NewServiceAccountClient(serviceAccountPath)
@@ -403,6 +412,24 @@ func authCodePrompt(url string) func() string {
 		}
 		return code
 	}
+}
+
+func authAdvancedPrompt() (string, string, error) {
+	var id, secret string
+	fmt.Print("Enter client id: ")
+
+	if _, err := fmt.Scan(&id); err != nil {
+		fmt.Printf("Failed reading id: %s", err.Error())
+		return "", "", err
+	}
+
+	fmt.Print("Enter client secret: ")
+	if _, err := fmt.Scan(&secret); err != nil {
+		fmt.Printf("Failed reading secret: %s", err.Error())
+		return "", "", err
+	}
+
+	return id, secret, nil;
 }
 
 func progressWriter(discard bool) io.Writer {
